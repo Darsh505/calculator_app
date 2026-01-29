@@ -1,26 +1,38 @@
+import ast 
+import operator
+
 class calculator:
+    def __inite__(self):
+        self.operators = {
+            ast.add: operator.add, 
+            ast.sub: operator.sub, 
+            ast.mult: operator.mul,
+            ast.div: operator.truediv
+        }
+
     def evaluate(self, expression):
         try:
-            result = eval(expression)
-            return result
-
+            tree = ast.parse(expresion, mode="eval")
+            return self._eval_node(tree.body)
         except ZeroDivisionError:
-            return "error: division by zero not possible"
+            return "error"
         except Exception:
-            return "invalid expression"
+            return "inavlid"
 
-def main():
-    calc = calculator()
+    def _eval_node(self, node):
+        if isinstance(node, ast.Num):
+            return node.n
 
-    while True:
-        expression = input("Enter an expression:")
+        if isinstance(self, ast.BinOp):
+            left = self._eval_node(node.left)
+            right = self._eval_node(node.right)
 
-        if expression.lower() == "exit":
-            print("goodbye!")
-            break
+            op_type = type(node.op)
+            if op_type in self.operators:
+                return self.operators[op_type](left, right)
+            else:
+                raise ValueError("Bad Operator") 
 
-        result = calc.evaluate(expression)
-        print("result:", result)
+        else:
+            raise ValueError("Bad Syntax")
 
-if __name__ == "__main__":
-    main()            
