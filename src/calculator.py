@@ -1,13 +1,13 @@
 import ast 
 import operator
 
-class calculator:
+class Calculator:
     def __inite__(self):
         self.operators = {
-            ast.add: operator.add, 
-            ast.sub: operator.sub, 
-            ast.mult: operator.mul,
-            ast.div: operator.truediv
+            ast.Add: operator.add, 
+            ast.Sub: operator.sub, 
+            ast.Mult: operator.mul,
+            ast.Div: operator.truediv
         }
 
     def evaluate(self, expression):
@@ -17,13 +17,13 @@ class calculator:
         except ZeroDivisionError:
             return "error"
         except Exception:
-            return "inavlid"
+            return "invalid"
 
     def _eval_node(self, node):
-        if isinstance(node, ast.Num):
+        if isinstance(node, ast.constant):
             return node.n
 
-        if isinstance(self, ast.BinOp):
+        if isinstance(node, ast.BinOp):
             left = self._eval_node(node.left)
             right = self._eval_node(node.right)
 
