@@ -2,7 +2,7 @@ import ast
 import operator
 
 class Calculator:
-    def __inite__(self):
+    def __init__(self):
         self.operators = {
             ast.Add: operator.add, 
             ast.Sub: operator.sub, 
@@ -12,7 +12,7 @@ class Calculator:
 
     def evaluate(self, expression):
         try:
-            tree = ast.parse(expresion, mode="eval")
+            tree = ast.parse(expression, mode="eval")
             return self._eval_node(tree.body)
         except ZeroDivisionError:
             return "error"
@@ -20,8 +20,8 @@ class Calculator:
             return "invalid"
 
     def _eval_node(self, node):
-        if isinstance(node, ast.constant):
-            return node.n
+        if isinstance(node, ast.Constant):
+            return node.value
 
         if isinstance(node, ast.BinOp):
             left = self._eval_node(node.left)
@@ -36,3 +36,7 @@ class Calculator:
         else:
             raise ValueError("Bad Syntax")
 
+if __name__== "__main__":
+    calc = Calculator()
+    print(calc.evaluate("2 + 3"))
+    print(calc.evaluate("10 / 2"))
