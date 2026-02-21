@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>calculator</title>
+    </head>
+    <body>
+
+        <h1>simple calculator</h1>
+
+        <input type = "text" id = "expression" placeholder = "Enter expression">
+        <button onclick ="calculate()"></button>
+
+        <h2 id = "result" ></h2>
+
+        <script>
+            async function calculate(){
+                const expression = document.getElementById("expression").value;
+
+                const response = await fetch("/calculate", {
+                    method: "POST",
+                    headers: {
+                        "content-Type": "application/json"
+                    },
+                    body: JSON.strengify({ expression: expression })
+                });
+                const data = await response.json();
+                document.getElementById("result").innerText = data.result;
+            }
+        </script>
+        
+    </body>
+</html>
