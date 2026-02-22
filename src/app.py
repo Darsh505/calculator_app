@@ -1,8 +1,12 @@
-from flask import Flask, request,jsonify
+from flask import Flask, request, jsonify, render_template
 from calculator import Calculator
 
 app = Flask(__name__)
 calc = Calculator()
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 @app.route("/calculate", methods=["post"])
 def calculate():
