@@ -1,32 +1,374 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calculator</title>
+        <style>
+            :root {
+                --bg-1: #f2f7ef;
+                --bg-2: #d7e7dd;
+                --stage: rgba(255, 255, 255, 0.28);
+                --stage-border: rgba(255, 255, 255, 0.45);
+                --calculator-bg: rgba(20, 35, 31, 0.92);
+                --display-bg: #0f1d1a;
+                --display-text: #f6fff8;
+                --display-muted: #88d8b0;
+                --input-bg: #eef7f1;
+                --input-text: #173229;
+                --number: #29443d;
+                --number-active: #34564d;
+                --utility: #dce8e1;
+                --utility-active: #bfcec6;
+                --operator: #7c5cff;
+                --operator-active: #6848eb;
+                --equals: #f4b73f;
+                --equals-active: #e39d17;
+                --shadow: 0 34px 90px rgba(30, 61, 50, 0.18);
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                padding: 28px;
+                background:
+                    radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), transparent 24%),
+                    linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            }
+
+            .stage {
+                width: min(1280px, 100%);
+                min-height: min(760px, calc(100vh - 56px));
+                display: grid;
+                place-items: center;
+                padding: clamp(18px, 3vw, 34px);
+                border-radius: 42px;
+                background: var(--stage);
+                border: 1px solid var(--stage-border);
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(18px);
+            }
+
+            .calculator {
+                width: min(100%, 1040px);
+                padding: 28px;
+                border-radius: 38px;
+                background:
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+                    var(--calculator-bg);
+                box-shadow: 0 26px 70px rgba(14, 30, 25, 0.28);
+                display: grid;
+                grid-template-columns: minmax(300px, 0.95fr) minmax(420px, 1.35fr);
+                gap: 22px;
+                align-items: stretch;
+            }
+
+            .left-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .title-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .title {
+                margin: 0;
+                color: #a6cabb;
+                font-size: 0.95rem;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                font-weight: 700;
+            }
+
+            .badge {
+                padding: 8px 12px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.08);
+                color: #def8e8;
+                font-size: 0.82rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+
+            .display {
+                flex: 1;
+                padding: 24px;
+                border-radius: 30px;
+                background: var(--display-bg);
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+            }
+
+            .display-expression {
+                min-height: 32px;
+                margin: 0 0 14px;
+                color: var(--display-muted);
+                font-size: 1.05rem;
+                text-align: right;
+                word-break: break-all;
+            }
+
+            .display-result {
+                min-height: 84px;
+                margin: 0;
+                color: var(--display-text);
+                font-size: clamp(3.2rem, 5vw, 5rem);
+                font-weight: 700;
+                line-height: 1;
+                text-align: right;
+                word-break: break-all;
+            }
+
+            .manual-entry {
+                width: 100%;
+                padding: 16px 18px;
+                border: 0;
+                border-radius: 18px;
+                background: var(--input-bg);
+                color: var(--input-text);
+                font-size: 1.08rem;
+            }
+
+            .manual-entry:focus {
+                outline: 3px solid rgba(124, 92, 255, 0.28);
+            }
+
+            .keys {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 14px;
+            }
+
+            button {
+                min-height: 92px;
+                border: 0;
+                border-radius: 26px;
+                font-size: 1.55rem;
+                font-weight: 700;
+                color: #f7fff9;
+                background: var(--number);
+                transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+                box-shadow: inset 0 -4px 0 rgba(255, 255, 255, 0.02);
+            }
+
+            button:active {
+                transform: scale(0.98);
+            }
+
+            .utility {
+                background: var(--utility);
+                color: #173229;
+            }
+
+            .utility:active {
+                background: var(--utility-active);
+            }
+
+            .operator {
+                background: var(--operator);
+            }
+
+            .operator:active {
+                background: var(--operator-active);
+            }
+
+            .equals {
+                grid-column: span 2;
+                background: var(--equals);
+                color: #382500;
+            }
+
+            .equals:active {
+                background: var(--equals-active);
+            }
+
+            .number:active {
+                background: var(--number-active);
+            }
+
+            @media (max-width: 960px) {
+                .calculator {
+                    grid-template-columns: 1fr;
+                }
+
+                .display {
+                    min-height: 220px;
+                }
+            }
+
+            @media (max-width: 720px) {
+                body {
+                    padding: 0;
+                }
+
+                .stage {
+                    width: 100%;
+                    min-height: 100vh;
+                    border-radius: 0;
+                    padding: 0;
+                    background: transparent;
+                    border: 0;
+                    box-shadow: none;
+                }
+
+                .calculator {
+                    width: 100%;
+                    min-height: 100vh;
+                    border-radius: 0;
+                    padding: 22px 18px 18px;
+                    grid-template-columns: 1fr;
+                }
+
+                button {
+                    min-height: 76px;
+                    border-radius: 20px;
+                }
+            }
+        </style>
     </head>
     <body>
+        <main class="stage">
+            <section class="calculator">
+                <div class="left-panel">
+                    <div class="title-row">
+                        <h1 class="title">Calculator</h1>
+                        <span class="badge">Wide Mode</span>
+                    </div>
 
-        <h1>simple calculator</h1>
+                    <section class="display" aria-live="polite">
+                        <p class="display-expression" id="expression-display">0</p>
+                        <p class="display-result" id="result-display">0</p>
+                    </section>
 
-        <input type = "text" id = "expression" placeholder = "Enter expression">
-        <button onclick ="calculate()"></button>
+                    <input
+                        class="manual-entry"
+                        id="expression-input"
+                        type="text"
+                        inputmode="numeric"
+                        placeholder="Enter expression"
+                        aria-label="Expression"
+                    >
+                </div>
 
-        <h2 id = "result" ></h2>
+                <section class="keys" aria-label="Calculator keypad">
+                    <button class="utility" type="button" data-action="clear">AC</button>
+                    <button class="utility" type="button" data-action="delete">DEL</button>
+                    <button class="utility" type="button" data-value="(">(</button>
+                    <button class="operator" type="button" data-value="/">/</button>
+
+                    <button class="number" type="button" data-value="7">7</button>
+                    <button class="number" type="button" data-value="8">8</button>
+                    <button class="number" type="button" data-value="9">9</button>
+                    <button class="operator" type="button" data-value="*">*</button>
+
+                    <button class="number" type="button" data-value="4">4</button>
+                    <button class="number" type="button" data-value="5">5</button>
+                    <button class="number" type="button" data-value="6">6</button>
+                    <button class="operator" type="button" data-value="-">-</button>
+
+                    <button class="number" type="button" data-value="1">1</button>
+                    <button class="number" type="button" data-value="2">2</button>
+                    <button class="number" type="button" data-value="3">3</button>
+                    <button class="operator" type="button" data-value="+">+</button>
+
+                    <button class="number" type="button" data-value="0">0</button>
+                    <button class="number" type="button" data-value=".">.</button>
+                    <button class="number" type="button" data-value=")">)</button>
+                    <button class="equals" type="button" data-action="calculate">=</button>
+                </section>
+            </section>
+        </main>
 
         <script>
-            async function calculate(){
-                const expression = document.getElementById("expression").value;
+            const inputEl = document.getElementById("expression-input");
+            const expressionDisplayEl = document.getElementById("expression-display");
+            const resultDisplayEl = document.getElementById("result-display");
+            const keypadEl = document.querySelector(".keys");
 
-                const response = await fetch("/calculate", {
-                    method: "POST",
-                    headers: {
-                        "content-Type": "application/json"
-                    },
-                    body: JSON.strengify({ expression: expression })
-                });
-                const data = await response.json();
-                document.getElementById("result").innerText = data.result;
+            function syncDisplay() {
+                expressionDisplayEl.textContent = inputEl.value || "0";
             }
+
+            async function runCalculation() {
+                const expression = inputEl.value.trim();
+
+                if (!expression) {
+                    resultDisplayEl.textContent = "0";
+                    syncDisplay();
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/calculate", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ expression: expression })
+                    });
+
+                    const data = await response.json();
+                    resultDisplayEl.textContent = String(data.result);
+                } catch (error) {
+                    resultDisplayEl.textContent = "invalid";
+                }
+            }
+
+            keypadEl.addEventListener("click", async (event) => {
+                const button = event.target.closest("button");
+                if (!button) {
+                    return;
+                }
+
+                const action = button.dataset.action;
+                const value = button.dataset.value;
+
+                if (action === "clear") {
+                    inputEl.value = "";
+                    resultDisplayEl.textContent = "0";
+                    syncDisplay();
+                    return;
+                }
+
+                if (action === "delete") {
+                    inputEl.value = inputEl.value.slice(0, -1);
+                    syncDisplay();
+                    return;
+                }
+
+                if (action === "calculate") {
+                    await runCalculation();
+                    return;
+                }
+
+                if (value) {
+                    inputEl.value += value;
+                    syncDisplay();
+                }
+            });
+
+            inputEl.addEventListener("input", syncDisplay);
+
+            inputEl.addEventListener("keydown", async (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    await runCalculation();
+                }
+            });
+
+            syncDisplay();
         </script>
-        
     </body>
 </html>

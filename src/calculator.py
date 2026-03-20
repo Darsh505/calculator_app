@@ -46,6 +46,10 @@ class Calculator:
         if isinstance(node, ast.Constant):
             return node.value
 
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
+            operand = self._eval_node(node.operand)
+            return operand if isinstance(node.op, ast.UAdd) else -operand
+
         # If the node is a binary operation (e.g. +, -, *, /)
 
         if isinstance(node, ast.BinOp):
